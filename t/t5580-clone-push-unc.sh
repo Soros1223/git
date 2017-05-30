@@ -8,12 +8,6 @@ if ! test_have_prereq MINGW; then
 	test_done
 fi
 
-test_expect_failure 'remote nick cannot contain backslashes' '
-	BACKSLASHED="$(pwd | tr / \\\\)" &&
-	git ls-remote "$BACKSLASHED" >out 2>err &&
-	! grep "unable to access" err
-'
-
 UNCPATH="$(pwd)"
 case "$UNCPATH" in
 [A-Z]:*)
@@ -49,6 +43,12 @@ test_expect_success push '
 	) &&
 	rev="$(git -C clone rev-parse --verify refs/heads/to-push)" &&
 	test "$rev" = "$(git rev-parse --verify refs/heads/to-push)"
+'
+
+test_expect_failure 'remote nick cannot contain backslashes' '
+	BACKSLASHED="$(pwd | tr / \\\\)" &&
+	git ls-remote "$BACKSLASHED" >out 2>err &&
+	test_i18ngrep ! "unable to access" err
 '
 
 test_done
